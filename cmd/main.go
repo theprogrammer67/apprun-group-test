@@ -27,6 +27,7 @@ func main() {
 			return nil
 		},
 		func(_ error) {
+			time.Sleep(1 * time.Second)
 			fmt.Println("interrupt gorutine 1")
 			cancel()
 		},
@@ -34,6 +35,7 @@ func main() {
 	)
 	start2 := g.AddAfter(
 		func(started *apprun.StartSignal) error {
+			time.Sleep(1 * time.Second)
 			fmt.Println("start gorutine 2")
 			time.Sleep(1 * time.Second)
 
@@ -43,6 +45,7 @@ func main() {
 			return nil
 		},
 		func(_ error) {
+			time.Sleep(1 * time.Second)
 			fmt.Println("interrupt gorutine 2")
 			cancel()
 		},

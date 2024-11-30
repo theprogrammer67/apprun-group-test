@@ -17,11 +17,11 @@ import (
 // The zero value of a Group is useful.
 type Group struct {
 	actors []actor
-	Log    *slog.Logger
+	log    *slog.Logger
 }
 
 func New(log *slog.Logger) Group {
-	return Group{Log: log}
+	return Group{log: log}
 }
 
 // Add an actor (function) to the group. Each actor must be pre-emptable by an
@@ -93,7 +93,7 @@ func (g *Group) addSignalHandler(ctx context.Context) {
 	g.Add(func() error {
 		err := execute()
 		if errors.As(err, &SignalError{}) {
-			g.Log.Warn(err.Error())
+			g.log.Warn(err.Error())
 
 			return nil
 		}
