@@ -77,20 +77,29 @@ func TestAddAfter(t *testing.T) {
 		)
 	}
 
-	g.Run()
-
-	var want [count]int
-	for i := 0; i < len(have); i++ {
-		want[i] = i
-		select {
-		case have[i] = <-num:
-		case <-time.After(100 * time.Millisecond):
-			t.Errorf("timeout")
+	res := make(chan error)
+	go func() { res <- g.Run() }()
+	select {
+	case err := <-res:
+		if err != nil {
+			t.Errorf("%v", err)
 		}
-	}
 
-	if want != have {
-		t.Errorf("want %v, have %v", want, have)
+		var want [count]int
+		for i := 0; i < len(have); i++ {
+			want[i] = i
+			select {
+			case have[i] = <-num:
+			case <-time.After(100 * time.Millisecond):
+				t.Errorf("timeout")
+			}
+		}
+
+		if want != have {
+			t.Errorf("incorrect execution order: want %v, have %v", want, have)
+		}
+	case <-time.After(100 * time.Millisecond):
+		t.Error("timeout")
 	}
 }
 
@@ -124,13 +133,22 @@ func TestAfterStart(t *testing.T) {
 		afterStart = true
 	}
 
-	g.Run()
+	res := make(chan error)
+	go func() { res <- g.Run() }()
+	select {
+	case err := <-res:
+		if err != nil {
+			t.Errorf("%v", err)
+		}
 
-	if !start {
-		t.Error("goroutine did not start")
-	}
-	if !afterStart {
-		t.Error("function AferStart not executed")
+		if !start {
+			t.Error("goroutine did not start")
+		}
+		if !afterStart {
+			t.Error("function AferStart not executed")
+		}
+	case <-time.After(100 * time.Millisecond):
+		t.Error("timeout")
 	}
 }
 
