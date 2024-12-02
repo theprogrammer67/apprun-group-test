@@ -2,6 +2,7 @@ package apprun_test
 
 import (
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -94,4 +95,41 @@ func TestAddAfter(t *testing.T) {
 }
 
 func TestAfterStart(t *testing.T) {
+	var start, afterStart bool
+	var mx sync.Mutex
+
+	var g apprun.Group
+	ss := g.AddAfter(
+		func(started *apprun.StartSignal) error {
+			mx.Lock()
+			start = true
+			mx.Unlock()
+
+			started.Success()
+
+			return nil
+		},
+		func(error) {},
+		nil,
+	)
+
+	ss.AferStart = func() {
+		mx.Lock()
+		started := start
+		mx.Unlock()
+
+		if !started {
+			t.Error("goroutine did not start before AferStart func")
+		}
+		afterStart = true
+	}
+
+	g.Run()
+
+	if !start {
+		t.Error("goroutine did not start")
+	}
+	if !afterStart {
+		t.Error("function AferStart not executed")
+	}
 }

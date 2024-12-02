@@ -14,10 +14,10 @@ func NewStartSignal() *StartSignal {
 }
 
 func (s *StartSignal) Success() {
-	s.ch <- true
 	if s.AferStart != nil {
 		s.AferStart()
 	}
+	s.ch <- true
 }
 
 func (s *StartSignal) Error() {
