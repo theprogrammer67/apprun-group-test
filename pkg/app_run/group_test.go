@@ -133,3 +133,7 @@ func TestAfterStart(t *testing.T) {
 		t.Error("function AferStart not executed")
 	}
 }
+
+func TestRunApp(t *testing.T) {
+	// TO DO
+}
