@@ -43,12 +43,10 @@ func (g *Group) Add(execute func() error, interrupt func(error)) {
 // When the first actor returns, all others are interrupted.
 // Run only returns when all actors have exited.
 // Run returns the error returned by the first exiting actor.
-func (g *Group) Run(ctx context.Context) error {
+func (g *Group) Run() error {
 	if len(g.actors) == 0 {
 		return nil
 	}
-
-	g.addSignalHandler(ctx)
 
 	// Run each actor.
 	errors := make(chan error, len(g.actors))
@@ -73,6 +71,16 @@ func (g *Group) Run(ctx context.Context) error {
 
 	// Return the original error.
 	return err
+}
+
+func (g *Group) RunApp(ctx context.Context) error {
+	if len(g.actors) == 0 {
+		return nil
+	}
+
+	g.addSignalHandler(ctx)
+
+	return g.Run()
 }
 
 func (g *Group) AddAfter(execute func(started *StartSignal) error, interrupt func(error), after *StartSignal) *StartSignal {

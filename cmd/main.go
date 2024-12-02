@@ -56,7 +56,7 @@ func main() {
 		fmt.Println("application started")
 	}
 
-	g.Run(ctx)
+	g.RunApp(ctx)
 
 	fmt.Println("application stopped")
 }
