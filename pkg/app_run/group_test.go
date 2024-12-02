@@ -55,3 +55,36 @@ func TestMany(t *testing.T) {
 		t.Errorf("timeout")
 	}
 }
+
+func TestAfter(t *testing.T) {
+	const count = 10
+	var have [count]int
+	num := make(chan int, count)
+
+	var g apprun.Group
+	var prev *apprun.StartSignal
+	for i := 0; i < len(have); i++ {
+		n := i
+		prev = g.AddAfter(
+			func(started *apprun.StartSignal) error {
+				num <- n
+				started.Success()
+				return nil
+			},
+			func(error) {},
+			prev,
+		)
+	}
+
+	g.Run()
+
+	var want [count]int
+	for i := 0; i < len(have); i++ {
+		want[i] = i
+		have[i] = <-num
+	}
+
+	if want != have {
+		t.Errorf("want %v, have %v", want, have)
+	}
+}
