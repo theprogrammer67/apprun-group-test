@@ -56,7 +56,7 @@ func TestMany(t *testing.T) {
 	}
 }
 
-func TestAfter(t *testing.T) {
+func TestAddAfter(t *testing.T) {
 	const count = 10
 	var have [count]int
 	num := make(chan int, count)
@@ -81,10 +81,17 @@ func TestAfter(t *testing.T) {
 	var want [count]int
 	for i := 0; i < len(have); i++ {
 		want[i] = i
-		have[i] = <-num
+		select {
+		case have[i] = <-num:
+		case <-time.After(100 * time.Millisecond):
+			t.Errorf("timeout")
+		}
 	}
 
 	if want != have {
 		t.Errorf("want %v, have %v", want, have)
 	}
+}
+
+func TestAfterStart(t *testing.T) {
 }
