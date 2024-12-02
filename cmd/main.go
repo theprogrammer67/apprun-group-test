@@ -52,7 +52,7 @@ func main() {
 		start1,
 	)
 
-	start2.AferStartFunc = func() {
+	start2.AferStart = func() {
 		fmt.Println("application started")
 	}
 

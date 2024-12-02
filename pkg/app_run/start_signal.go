@@ -3,8 +3,8 @@ package apprun
 import "context"
 
 type StartSignal struct {
-	ch            chan bool
-	AferStartFunc func()
+	ch        chan bool
+	AferStart func()
 }
 
 func NewStartSignal() *StartSignal {
@@ -15,8 +15,8 @@ func NewStartSignal() *StartSignal {
 
 func (s *StartSignal) Success() {
 	s.ch <- true
-	if s.AferStartFunc != nil {
-		s.AferStartFunc()
+	if s.AferStart != nil {
+		s.AferStart()
 	}
 }
 
