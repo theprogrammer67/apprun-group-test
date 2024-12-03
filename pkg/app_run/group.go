@@ -74,6 +74,7 @@ func (g *Group) Run() error {
 	return err
 }
 
+// Adds the SignalHandler actor and run all actors
 func (g *Group) RunApp(ctx context.Context) error {
 	if len(g.actors) == 0 {
 		return nil
@@ -84,6 +85,9 @@ func (g *Group) RunApp(ctx context.Context) error {
 	return g.Run()
 }
 
+// Add an actor (function) to the group.
+// Returns a signal that allows notifying another actor of a successful run.
+// The run of an actor may depend on a signal from another actor.
 func (g *Group) AddAfter(execute func(started *StartSignal) error, interrupt func(error), after *StartSignal) *StartSignal {
 
 	actor := actor{
@@ -97,6 +101,7 @@ func (g *Group) AddAfter(execute func(started *StartSignal) error, interrupt fun
 	return actor.started
 }
 
+// Adds the SignalHandler actor
 func (g *Group) addSignalHandler(ctx context.Context) {
 	execute, interrupt := SignalHandler(ctx, syscall.SIGINT, syscall.SIGTERM)
 	g.Add(func() error {
