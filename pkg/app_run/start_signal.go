@@ -1,7 +1,5 @@
 package apprun
 
-import "context"
-
 type StartSignal struct {
 	ch        chan error
 	AferStart func()
@@ -26,13 +24,4 @@ func (s *StartSignal) Error(err error) {
 
 func (s *StartSignal) Wait() error {
 	return <-s.ch
-}
-
-func (s *StartSignal) WaitWithContext(ctx context.Context) error {
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case res := <-s.ch:
-		return res
-	}
 }
