@@ -8,6 +8,7 @@ package apprun
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"syscall"
 )
@@ -121,10 +122,11 @@ type actor struct {
 
 func (a *actor) exec() error {
 	if a.after != nil {
-		res := a.after.Wait()
-		if !res {
-			a.started.Error()
-			return errors.New("error starting previous group item")
+		err := a.after.Wait()
+		if err != nil {
+			err := fmt.Errorf("error starting previous group item: %w", err)
+			a.started.Error(err)
+			return err
 		}
 	}
 

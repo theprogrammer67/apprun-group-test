@@ -56,7 +56,10 @@ func main() {
 		fmt.Println("application started")
 	}
 
-	g.RunApp(ctx)
+	err := g.RunApp(ctx)
+	if err != nil {
+		fmt.Println("application start error:", err)
+	}
 
 	fmt.Println("application stopped")
 }
