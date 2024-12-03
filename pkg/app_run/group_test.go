@@ -103,6 +103,42 @@ func TestAddAfter(t *testing.T) {
 	}
 }
 
+func TestAddAfterError(t *testing.T) {
+	whant := errors.New("test error")
+
+	var g apprun.Group
+	first := g.AddAfter(
+		func(started *apprun.StartSignal) error {
+			started.Error(whant)
+			return whant
+		},
+		func(error) {},
+		nil,
+	)
+
+	g.AddAfter(
+		func(started *apprun.StartSignal) error {
+			t.Error("goroutine started although the previous goroutine exited with an error")
+
+			return nil
+		},
+		func(error) {},
+		first,
+	)
+
+	res := make(chan error)
+	go func() { res <- g.Run() }()
+	select {
+	case err := <-res:
+		if !errors.Is(err, whant) {
+			t.Errorf("incorrect error: %v", err)
+		}
+	case <-time.After(100 * time.Hour):
+		t.Error("timeout")
+	}
+
+}
+
 func TestAfterStart(t *testing.T) {
 	var start, afterStart bool
 	var mx sync.Mutex
